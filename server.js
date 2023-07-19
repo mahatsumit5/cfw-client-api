@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
-import { mongoConnect } from "./src/mongoConfig.js";
+import { mongoConnect } from "./src/config/mongoConfig.js";
 const app = express();
 const PORT = 8000 || process.env.PORT;
 
@@ -13,12 +13,10 @@ app.use(cors()); //cross origin resources sharing for connection between client 
 app.use(morgan("dev")); // for development purpose to see
 app.use(express.json()); //send data in json format to frontEnd
 mongoConnect();
-app.get("/", (req, res) => {
-  res.json({
-    status: "success",
-    message: "Server is live",
-  });
-});
+
+import userRouter from "./src/router/userRouter.js";
+
+app.use("/api/v1/user", userRouter);
 
 app.listen(PORT, (error) => {
   error
