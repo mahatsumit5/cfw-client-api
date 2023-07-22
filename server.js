@@ -17,7 +17,20 @@ mongoConnect();
 import userRouter from "./src/router/userRouter.js";
 
 app.use("/api/v1/user", userRouter);
-
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "Server is live",
+  });
+});
+app.use((error, req, res, next) => {
+  const code = error.statusCode || 500;
+  res.status(code).json({
+    status: "error",
+    message: error.message,
+    code,
+  });
+});
 app.listen(PORT, (error) => {
   error
     ? console.log(error)
