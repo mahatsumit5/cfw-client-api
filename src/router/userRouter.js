@@ -3,17 +3,22 @@ import express from "express";
 import { getUserByEmail, insertUser, updateById } from "../model/userModel.js";
 import { comparePass, hashPassword } from "../utils/bcrypt.js";
 import { v4 } from "uuid";
-import { newUserValidation } from "../middleware/joiValidation.js";
+import {
+  newUserValidation,
+  userVerification,
+} from "../middleware/joiValidation.js";
 import { accountVerificationEmail } from "../utils/nodeMailer.js";
+import cryptoRandomString from "crypto-random-string";
 const router = express.Router();
 
 router.post("/", newUserValidation, async (req, res, next) => {
   try {
     req.body.password = hashPassword(req.body.password);
-    req.body.verificationCode = v4();
+    req.body.verificationCode = cryptoRandomString({ length: 10 });
     const user = await insertUser(req.body);
+    const uuid = v4();
     if (user?._id) {
-      const link = `${process.env.WEB_DOMAIN}/user-verification?c=${user.verificationCode}&&e=${user.email}`;
+      const link = `${process.env.WEB_DOMAIN}/user-verification?c=${uuid}&&e=${user.email}`;
       const status = await accountVerificationEmail(user, link);
       console.log(status);
       res.json({
@@ -36,7 +41,7 @@ router.post("/", newUserValidation, async (req, res, next) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", userVerification, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await getUserByEmail(email);
@@ -75,6 +80,7 @@ router.post("/login", async (req, res) => {
 router.put("/verify", async (req, res, next) => {
   try {
     const { email, code } = req.body;
+    console.log(email, code);
     const { verificationCode, _id, isVerified } = await getUserByEmail(email);
     if (isVerified) {
       throw new Error("Already verified");

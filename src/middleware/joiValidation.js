@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { getUserByEmail } from "../model/userModel.js";
 
 const SHORTSTE = Joi.string().min(3).max(100);
 const SHORTSTEREQ = Joi.string().min(3).max(100).required();
@@ -28,6 +29,28 @@ export const newUserValidation = (req, res, next) => {
           message: error.message,
         })
       : next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const userVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await getUserByEmail(email);
+    if (user) {
+      user?.verificationCode === ""
+        ? next()
+        : res.json({
+            status: "info",
+            message: "Verify your email first to login",
+          });
+      return;
+    }
+    res.json({
+      status: "info",
+      message: "No match found with that email",
+    });
   } catch (error) {
     next(error);
   }
