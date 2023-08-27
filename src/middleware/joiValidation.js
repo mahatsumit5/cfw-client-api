@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { getUserByEmail } from "../model/userModel.js";
+import { getUserByEmail } from "../model/user/userModel.js";
 
 const SHORTSTE = Joi.string().min(3).max(100);
 const SHORTSTEREQ = Joi.string().min(3).max(100).required();

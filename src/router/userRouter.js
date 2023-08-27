@@ -1,6 +1,11 @@
 import express from "express";
 
-import { getUserByEmail, insertUser, updateById } from "../model/userModel.js";
+import {
+  getAllUsers,
+  insertUser,
+  updateByEmail,
+  updateById,
+} from "../model/user/userModel.js";
 import { comparePass, hashPassword } from "../utils/bcrypt.js";
 import { v4 } from "uuid";
 import {
@@ -9,9 +14,50 @@ import {
 } from "../middleware/joiValidation.js";
 import { accountVerificationEmail } from "../utils/nodeMailer.js";
 import cryptoRandomString from "crypto-random-string";
+import { getUserByEmail } from "../model/user/userModel.js";
+import { createAccessJWT, createRefreshJWT } from "../utils/jwt.js";
+import { auth, refreshAuth } from "../middleware/authMiddleware.js";
+import { findOneAndDelete } from "../model/session/sessionModel.js";
 const router = express.Router();
 
-router.post("/", newUserValidation, async (req, res, next) => {
+router.get("/", auth, (req, res, next) => {
+  try {
+    res.json({
+      status: "success",
+      message: "userInfo",
+      user: req.userInfo, //coming from auth
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+router.get("/get-users", auth, async (req, res, next) => {
+  try {
+    const users = await getAllUsers();
+    if (users.length) {
+      users.map((user) => {
+        user.password = undefined;
+        user.token = undefined;
+        user.verificationCode = undefined;
+        user._id = undefined;
+        user.__v = undefined;
+      });
+    }
+    users.length
+      ? res.json({
+          status: "success",
+          message: "uList of users",
+          users,
+        })
+      : res.json({
+          status: "error",
+          message: "error",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+router.post("/", auth, newUserValidation, async (req, res, next) => {
   try {
     req.body.password = hashPassword(req.body.password);
     req.body.verificationCode = cryptoRandomString({ length: 10 });
@@ -41,34 +87,32 @@ router.post("/", newUserValidation, async (req, res, next) => {
   }
 });
 
-router.post("/login", userVerification, async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await getUserByEmail(email);
     if (user) {
       const isMatch = comparePass(password, user?.password);
       if (isMatch) {
-        user.password = undefined;
+        const accessJWT = await createAccessJWT(email);
+        const refreshJWT = await createRefreshJWT(email);
         return res.json({
           status: "success",
           message: `Welcome Back ${user.fName} ${user.lName} `,
-          user,
+          token: { accessJWT, refreshJWT },
         });
       } else {
         // wrong credentials provided!
-        res.json({
+        return res.json({
           status: "warning",
           message: "Password Incorrect",
         });
       }
-    } else {
-      //User not found
-
-      res.json({
-        status: "info",
-        message: `User with Email ID '${email}' doesnot exist`,
-      });
     }
+    res.json({
+      status: "info",
+      message: `User with Email ID '${email}' doesnot exist`,
+    });
   } catch (error) {
     res.json({
       status: "error",
@@ -76,6 +120,8 @@ router.post("/login", userVerification, async (req, res) => {
     });
   }
 });
+// return the refreshJWT
+router.get("/get-accessjwt", refreshAuth);
 
 router.put("/verify", async (req, res, next) => {
   try {
@@ -106,4 +152,22 @@ router.put("/verify", async (req, res, next) => {
   }
 });
 
+router.post("/logout", async (req, res, next) => {
+  try {
+    const { _id, refreshJWT, accessJWT } = req.body;
+    console.log(refreshJWT, accessJWT);
+    const result = await updateById({ _id }, { token: "" });
+    console.log(result);
+    if (result?._id) {
+      await findOneAndDelete({ accessJWT });
+    }
+
+    res.json({
+      status: "success",
+      successMessage: "Logged out successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 export default router;
