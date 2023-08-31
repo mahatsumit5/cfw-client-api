@@ -8,9 +8,7 @@ import {
 export const auth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
-    console.log(authorization);
     const { email } = verifyAccessJWT(authorization);
-    console.log(email);
     //decoded have three properties one of them being user email
     // extrat email and get get user by email
     if (email) {

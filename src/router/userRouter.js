@@ -57,7 +57,7 @@ router.get("/get-users", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.post("/", auth, newUserValidation, async (req, res, next) => {
+router.post("/", newUserValidation, async (req, res, next) => {
   try {
     req.body.password = hashPassword(req.body.password);
     req.body.verificationCode = cryptoRandomString({ length: 10 });
