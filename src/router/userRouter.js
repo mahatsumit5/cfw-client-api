@@ -66,7 +66,6 @@ router.post("/", newUserValidation, async (req, res, next) => {
     if (user?._id) {
       const link = `${process.env.WEB_DOMAIN}/user-verification?c=${uuid}&&e=${user.email}`;
       const status = await accountVerificationEmail(user, link);
-      console.log(status);
       res.json({
         status: "success",
         message: "Account Created.",

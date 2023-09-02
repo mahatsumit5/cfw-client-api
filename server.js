@@ -13,10 +13,13 @@ app.use(cors()); //cross origin resources sharing for connection between client 
 app.use(morgan("dev")); // for development purpose to see
 app.use(express.json()); //send data in json format to frontEnd
 mongoConnect();
-
+// await excuteCRUDOperaion();
 import userRouter from "./src/router/userRouter.js";
-
+import productRouter from "./src/router/productRouter.js";
+import catagoryRouter from "./src/router/catagoryRouter.js";
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/product", productRouter);
+app.use("/api/v1/catagory", catagoryRouter);
 app.get("/", (req, res) => {
   res.json({
     status: "success",
