@@ -12,11 +12,12 @@ dotenv.config(); //using dotenv to process dotenv key
 app.use(cors()); //cross origin resources sharing for connection between client and server
 app.use(morgan("dev")); // for development purpose to see
 app.use(express.json()); //send data in json format to frontEnd
-mongoConnect();
+// mongoConnect();
 // await excuteCRUDOperaion();
 import userRouter from "./src/router/userRouter.js";
 import productRouter from "./src/router/productRouter.js";
 import catagoryRouter from "./src/router/catagoryRouter.js";
+import mongoose from "mongoose";
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);
@@ -34,8 +35,11 @@ app.use((error, req, res, next) => {
     code,
   });
 });
-app.listen(PORT, (error) => {
-  error
-    ? console.log(error)
-    : console.log(`Server running on port http://localhost:${PORT}`);
+mongoose.connect(process.env.MONGO_URI).then(() => {
+  console.log(`MongoDb is Connected at ${process.env.MONGO_URI}`);
+  app.listen(PORT, (error) => {
+    error
+      ? console.log(error)
+      : console.log(`Server running on port http://localhost:${PORT}`);
+  });
 });
