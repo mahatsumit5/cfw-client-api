@@ -47,12 +47,13 @@ export const refreshAuth = async (req, res, next) => {
     const { authorization } = req.headers;
     // 2.decode the jwt
     const decoded = verifyRefreshJWT(authorization);
+    console.log(decoded, "decoded---------------");
     // 3. extract email and get user by email
     if (decoded?.email) {
       // 4. check fif the user is active
       const user = await getOneUser({
         email: decoded.email,
-        refreshJWT: authorization,
+        token: authorization,
       });
       if (user?._id && user?.status === "active") {
         // create new accessJWT

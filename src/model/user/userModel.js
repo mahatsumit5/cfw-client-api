@@ -18,7 +18,6 @@ export const getOneUser = (filter) => {
   return UserSchema.findOne(filter);
 };
 export const updateById = (_id, userObj) => {
-  console.log(_id);
   return UserSchema.findByIdAndUpdate(_id, userObj);
 };
 export const updateByEmail = (email, userObj) => {

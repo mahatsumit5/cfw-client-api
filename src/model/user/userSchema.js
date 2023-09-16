@@ -55,6 +55,13 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: "",
     },
+    favouriteItem: [
+      {
+        type: mongoose.Types.ObjectId,
+        required: false,
+        unique: true,
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   getAllUsers,
+  getUserById,
   insertUser,
   updateByEmail,
   updateById,
@@ -31,32 +32,7 @@ router.get("/", auth, (req, res, next) => {
     next(error);
   }
 });
-router.get("/get-users", auth, async (req, res, next) => {
-  try {
-    const users = await getAllUsers();
-    if (users.length) {
-      users.map((user) => {
-        user.password = undefined;
-        user.token = undefined;
-        user.verificationCode = undefined;
-        user._id = undefined;
-        user.__v = undefined;
-      });
-    }
-    users.length
-      ? res.json({
-          status: "success",
-          message: "uList of users",
-          users,
-        })
-      : res.json({
-          status: "error",
-          message: "error",
-        });
-  } catch (error) {
-    next(error);
-  }
-});
+
 router.post("/", newUserValidation, async (req, res, next) => {
   try {
     req.body.password = hashPassword(req.body.password);
@@ -169,4 +145,47 @@ router.post("/logout", async (req, res, next) => {
     next(error);
   }
 });
+
+router.post("/addFav", auth, async (req, res, next) => {
+  try {
+    const { _id, fav } = req.body;
+    const user = await getUserById({ _id });
+    if (user?.favouriteItem.includes(fav)) {
+      const newArrayOfFavItem = user.favouriteItem.filter(
+        (item) => item._id.toString() !== fav
+      );
+      console.log(newArrayOfFavItem);
+      const result = await updateById(
+        { _id },
+        { favouriteItem: newArrayOfFavItem }
+      );
+      result
+        ? res.json({
+            status: "success",
+            message: "Removed from the list",
+          })
+        : res.json({
+            status: "error",
+            message: "Error",
+          });
+      return;
+    }
+    const result = await updateById(
+      { _id },
+      { favouriteItem: [...user?.favouriteItem, fav] }
+    );
+    result
+      ? res.json({
+          status: "success",
+          message: "Added to favourite",
+        })
+      : res.json({
+          status: "error",
+          message: "Not able to add to favourite",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
