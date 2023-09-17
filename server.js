@@ -17,10 +17,12 @@ mongoConnect();
 import userRouter from "./src/router/userRouter.js";
 import productRouter from "./src/router/productRouter.js";
 import catagoryRouter from "./src/router/catagoryRouter.js";
+import paymentRouter from "./src/router/paymentRouter.js";
 import mongoose from "mongoose";
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);
+app.use("/api/v1/payment", paymentRouter);
 app.get("/", (req, res) => {
   res.json({
     status: "success",
