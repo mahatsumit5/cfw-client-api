@@ -150,11 +150,13 @@ router.post("/addFav", auth, async (req, res, next) => {
   try {
     const { _id, fav } = req.body;
     const user = await getUserById({ _id });
-    if (user?.favouriteItem.includes(fav)) {
+
+    if (user?.favouriteItem.some((item) => item.sku === fav.sku)) {
+      console.log("first");
       const newArrayOfFavItem = user.favouriteItem.filter(
-        (item) => item._id.toString() !== fav
+        (item) => item._id.toString() !== fav._id
       );
-      console.log(newArrayOfFavItem);
+      console.log(newArrayOfFavItem, "new arrayyyyyyyyyyyyyyyyyyy");
       const result = await updateById(
         { _id },
         { favouriteItem: newArrayOfFavItem }
@@ -170,6 +172,7 @@ router.post("/addFav", auth, async (req, res, next) => {
           });
       return;
     }
+
     const result = await updateById(
       { _id },
       { favouriteItem: [...user?.favouriteItem, fav] }

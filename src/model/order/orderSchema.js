@@ -16,8 +16,6 @@ const orderSchema = new mongoose.Schema(
         },
         slug: {
           type: String,
-          unique: true,
-          index: 1,
           required: true,
         },
         price: {
