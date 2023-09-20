@@ -13,12 +13,19 @@ import {
   newUserValidation,
   userVerification,
 } from "../middleware/joiValidation.js";
-import { accountVerificationEmail } from "../utils/nodeMailer.js";
+import {
+  accountVerificationEmail,
+  sendPasswordResetLink,
+} from "../utils/nodeMailer.js";
 import cryptoRandomString from "crypto-random-string";
 import { getUserByEmail } from "../model/user/userModel.js";
 import { createAccessJWT, createRefreshJWT } from "../utils/jwt.js";
 import { auth, refreshAuth } from "../middleware/authMiddleware.js";
-import { findOneAndDelete } from "../model/session/sessionModel.js";
+import {
+  addNewSession,
+  findOneAndDelete,
+} from "../model/session/sessionModel.js";
+import { compareSync } from "bcryptjs";
 const router = express.Router();
 
 router.get("/", auth, (req, res, next) => {
@@ -98,6 +105,55 @@ router.post("/login", async (req, res) => {
 // return the refreshJWT
 router.get("/get-accessjwt", refreshAuth);
 
+router.post("/get-reset-pass-link", async (res, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await getUserByEmail(email);
+    if (user) {
+      const result = await addNewSession({
+        token: 12345,
+        associate: email,
+      });
+      if (result) {
+        // send password reset link to the user to their email
+        const result = await sendPasswordResetLink();
+        result?._id
+          ? res.json({
+              status: "success",
+              message:
+                "A link has been sent to your email.Please check your email",
+            })
+          : res.json({
+              status: "error",
+              message: "Unable to send link email",
+            });
+      }
+      return;
+    }
+    res.json({
+      status: "error",
+      message: "User not found",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+router.put("/reset-password/:email/:token", async (req, res, next) => {
+  try {
+    const { newPassword } = req.body;
+    const { email, token } = req.params;
+    const result = findOneAndDelete({
+      associate: email,
+      token,
+    });
+    if (result) {
+      const password = hashPassword(newPassword);
+      const result = await updateByEmail(email, password);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 router.put("/verify", async (req, res, next) => {
   try {
     const { email, code } = req.body;
@@ -108,6 +164,7 @@ router.put("/verify", async (req, res, next) => {
     }
     if (code === verificationCode) {
       const result = await updateById(_id, {
+        status: "active",
         isVerified: true,
         verificationCode: "",
       });

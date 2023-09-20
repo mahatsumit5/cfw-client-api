@@ -86,3 +86,49 @@ Your Order ID is : ${result._id}
   console.log("Message sent: %s", info.messageId);
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
+
+export const sendPasswordResetLink = async (user, link) => {
+  const { email, fName, lName } = user;
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  // send mail with defined transport object
+  const info = await transporter.sendMail({
+    from: `"CFW" <${process.env.SMTP_USER}>`, // sender address
+    to: email, // list of receivers
+    subject: "Order received ✔", // Subject line
+    text: `Dear ${fName} ${lName}.
+    You requested to reset your password for your ICONIC account.
+
+    Follow the link below to create a new password:  ${result._id}`,
+    html: `
+    <p>
+    Dear ${fName}.${lName}
+</p>
+<p>
+You requested to reset your password for your ICONIC account.
+
+ Follow the link below to create a new password:
+</p>
+<br />
+<br />
+<button>${link}</button>
+<br />
+<br />
+
+<p>
+    Regareds, <br />
+    EST Store <br />
+    Customer Support Team
+</p>`,
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+};
