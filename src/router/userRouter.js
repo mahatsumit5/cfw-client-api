@@ -25,7 +25,6 @@ import {
   addNewSession,
   findOneAndDelete,
 } from "../model/session/sessionModel.js";
-import { compareSync } from "bcryptjs";
 const router = express.Router();
 
 router.get("/", auth, (req, res, next) => {
@@ -105,19 +104,23 @@ router.post("/login", async (req, res) => {
 // return the refreshJWT
 router.get("/get-accessjwt", refreshAuth);
 
-router.post("/get-reset-pass-link", async (res, res, next) => {
+router.post("/get-reset-pass-link", async (req, res, next) => {
   try {
+    const token = v4();
     const { email } = req.body;
     const user = await getUserByEmail(email);
     if (user) {
       const result = await addNewSession({
-        token: 12345,
+        token,
         associate: email,
       });
-      if (result) {
+      console.log(result);
+      if (result?._id) {
+        const link = `${process.env.WEB_DOMAIN}/reset-password?c=${token}&&e=${email}`;
         // send password reset link to the user to their email
-        const result = await sendPasswordResetLink();
-        result?._id
+        const isEmailSent = sendPasswordResetLink(user, link);
+        console.log(isEmailSent, "email sent-------------------");
+        isEmailSent
           ? res.json({
               status: "success",
               message:
@@ -140,15 +143,24 @@ router.post("/get-reset-pass-link", async (res, res, next) => {
 });
 router.put("/reset-password/:email/:token", async (req, res, next) => {
   try {
-    const { newPassword } = req.body;
+    console.log(req.body);
+    console.log(req.params, "comig from params------------");
+    const { password } = req.body;
     const { email, token } = req.params;
-    const result = findOneAndDelete({
+    const result = await findOneAndDelete({
       associate: email,
       token,
     });
+    console.log(result);
     if (result) {
-      const password = hashPassword(newPassword);
-      const result = await updateByEmail(email, password);
+      const newPassword = hashPassword(password);
+      const result = await updateByEmail({ email }, { password: newPassword });
+      result?._id
+        ? res.json({
+            status: "success",
+            message: "Your Password Updated Successfully",
+          })
+        : res.status("401").send("Invalid Token");
     }
   } catch (error) {
     next(error);

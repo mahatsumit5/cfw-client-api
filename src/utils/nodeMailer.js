@@ -102,11 +102,11 @@ export const sendPasswordResetLink = async (user, link) => {
   const info = await transporter.sendMail({
     from: `"CFW" <${process.env.SMTP_USER}>`, // sender address
     to: email, // list of receivers
-    subject: "Order received ✔", // Subject line
+    subject: "Password Reset", // Subject line
     text: `Dear ${fName} ${lName}.
     You requested to reset your password for your ICONIC account.
 
-    Follow the link below to create a new password:  ${result._id}`,
+    Follow the link below to create a new password:  ${link}`,
     html: `
     <p>
     Dear ${fName}.${lName}
@@ -118,7 +118,8 @@ You requested to reset your password for your ICONIC account.
 </p>
 <br />
 <br />
-<button>${link}</button>
+<a href=${link}>
+<button>Reset Password</button></a>
 <br />
 <br />
 
