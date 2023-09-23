@@ -1,8 +1,7 @@
 import express from "express";
-import { insertOrder } from "../model/order/orderModel.js";
-import Stripe from "stripe";
+import { getOrderById, insertOrder } from "../model/order/orderModel.js";
 import { orderConfirmationEmail } from "../utils/nodeMailer.js";
-import e from "express";
+import { stripePayment } from "../middleware/stripeMiddleware.js";
 const router = express();
 router.post("/", async (req, res, next) => {
   try {
@@ -13,6 +12,7 @@ router.post("/", async (req, res, next) => {
       return res.json({
         status: "success",
         message: "Thank you for placing the order",
+        orderNumber: result._id,
       });
     }
     res.status("401").json({
@@ -25,43 +25,21 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/checkout-with-stripe", async (req, res, next) => {
+router.post("/checkout-with-stripe", stripePayment);
+
+router.get("/:_id", async (req, res, next) => {
   try {
-    const stripe = Stripe(process.env.STRIPE_API);
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-
-      mode: "payment", // 'payment', 'setup' or 'subscription'
-      success_url: `${process.env.WEB_DOMAIN}/cart/order`,
-      cancel_url: `${process.env.WEB_DOMAIN}`,
-      line_items: req.body.map((item) => {
-        return {
-          price_data: {
-            currency: "aud",
-            product_data: {
-              name: `${item.title}`,
-            },
-            unit_amount: `${item.price}` * 100,
-          },
-          quantity: `${item.orderQty}`,
-        };
-      }),
-      // line_items: [
-      //   {
-      //     price_data: {
-      //       currency: "aud",
-      //       product_data: {
-      //         name: "shoe",
-      //       },
-      //       unit_amount: 2599 * 100,
-      //     },
-      //     quantity: 2,
-      //   },
-      // ],
-    });
-    console.log(session.url);
-    res.json({ url: session.url, session });
+    console.log(req.params);
+    const { _id } = req.params;
+    const result = await getOrderById(_id);
+    result?._id
+      ? res.json({
+          status: "success",
+          result,
+        })
+      : res.json({
+          status: "fail",
+        });
   } catch (error) {
     next(error);
   }
