@@ -27,15 +27,41 @@ router.post("/", async (req, res, next) => {
 
 router.post("/checkout-with-stripe", async (req, res, next) => {
   try {
-    const stripe = require("stripe")(
-      "sk_test_51NsR1aGbch8SC1C7pwtwxkjoWoWIjYlNBSxBWuCrhsP0tm5f4CFhEmzoLgg11L66nrDUDelrGpOPnwuAA9qBgt3100LNtzHHwo"
-    );
+    const stripe = Stripe(process.env.STRIPE_API);
 
     const session = await stripe.checkout.sessions.create({
-      success_url: "https://example.com/success",
-      line_items: [{ price: "price_H5ggYwtDq4fbrJ", quantity: 2 }],
-      mode: "payment",
+      payment_method_types: ["card"],
+
+      mode: "payment", // 'payment', 'setup' or 'subscription'
+      success_url: `${process.env.WEB_DOMAIN}/cart/order`,
+      cancel_url: `${process.env.WEB_DOMAIN}`,
+      line_items: req.body.map((item) => {
+        return {
+          price_data: {
+            currency: "aud",
+            product_data: {
+              name: `${item.title}`,
+            },
+            unit_amount: `${item.price}` * 100,
+          },
+          quantity: `${item.orderQty}`,
+        };
+      }),
+      // line_items: [
+      //   {
+      //     price_data: {
+      //       currency: "aud",
+      //       product_data: {
+      //         name: "shoe",
+      //       },
+      //       unit_amount: 2599 * 100,
+      //     },
+      //     quantity: 2,
+      //   },
+      // ],
     });
+    console.log(session.url);
+    res.json({ url: session.url, session });
   } catch (error) {
     next(error);
   }
