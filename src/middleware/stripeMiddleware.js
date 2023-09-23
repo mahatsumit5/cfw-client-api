@@ -10,11 +10,11 @@ export const stripePayment = async (req, res, next) => {
       success_url:
         process.env.NODE_ENV === "development"
           ? `${process.env.WEB_DOMAIN}/cart`
-          : "/cart",
+          : "https://cfw-api.onrender.com/cart",
       cancel_url:
         process.env.NODE_ENV === "development"
           ? `${process.env.WEB_DOMAIN}/cart`
-          : "/cart",
+          : "https://cfw-api.onrender.com/checkout",
       customer_email: req.body.user.email,
       line_items: req.body.orderItems.map((item) => {
         return {
