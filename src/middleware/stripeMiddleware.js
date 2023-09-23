@@ -7,8 +7,14 @@ export const stripePayment = async (req, res, next) => {
       payment_method_types: ["card"],
 
       mode: "payment", // 'payment', 'setup' or 'subscription'
-      success_url: `${process.env.WEB_DOMAIN}/cart`,
-      cancel_url: `${process.env.WEB_DOMAIN}`,
+      success_url:
+        process.env.NODE.ENV === "development"
+          ? `${process.env.WEB_DOMAIN}/cart`
+          : "/cart",
+      cancel_url:
+        process.env.NODE.ENV === "development"
+          ? `${process.env.WEB_DOMAIN}/cart`
+          : "/cart",
       customer_email: req.body.user.email,
       line_items: req.body.orderItems.map((item) => {
         return {

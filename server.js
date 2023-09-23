@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { mongoConnect } from "./src/config/mongoConfig.js";
 const app = express();
-const PORT = 8010 || process.env.PORT;
+const PORT = process.env.PORT || 8010;
 
 dotenv.config(); //using dotenv to process dotenv key
 
