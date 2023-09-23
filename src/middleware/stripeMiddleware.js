@@ -12,7 +12,7 @@ export const stripePayment = async (req, res, next) => {
           ? `${process.env.WEB_DOMAIN}/cart`
           : "/cart",
       cancel_url:
-        process.env.NODE.ENV === "development"
+        process.env.NODE_ENV === "development"
           ? `${process.env.WEB_DOMAIN}/cart`
           : "/cart",
       customer_email: req.body.user.email,
