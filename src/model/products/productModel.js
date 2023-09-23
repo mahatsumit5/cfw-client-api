@@ -14,6 +14,5 @@ export const getProductsByCatagory = (filter) => {
   return prouduct.find({ parentCat: _id, status: "active" });
 };
 export const getSingleProduct = (filter) => {
-  console.log(filter, "coming from model");
   return prouduct.findOne(filter);
 };

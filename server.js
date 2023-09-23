@@ -14,6 +14,15 @@ app.use(morgan("dev")); // for development purpose to see
 app.use(express.json()); //send data in json format to frontEnd
 mongoConnect();
 // await excuteCRUDOperaion();
+
+import path from "path";
+
+const __dirname = path.resolve();
+console.log(__dirname);
+// convert public to static
+app.use(express.static(path.join(__dirname + "/public")));
+app.use(express.static(__dirname + "/build"));
+
 import userRouter from "./src/router/userRouter.js";
 import productRouter from "./src/router/productRouter.js";
 import catagoryRouter from "./src/router/catagoryRouter.js";
@@ -25,11 +34,9 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/order", orderRouter);
-app.get("/", (req, res) => {
-  res.json({
-    status: "success",
-    message: "Server is live",
-  });
+
+app.use("/", (req, res) => {
+  res.sendFile(__dirname + "/build/index.html");
 });
 app.use((error, req, res, next) => {
   const code = error.statusCode || 500;

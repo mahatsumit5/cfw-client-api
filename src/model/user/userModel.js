@@ -21,7 +21,6 @@ export const updateById = (_id, userObj) => {
   return UserSchema.findByIdAndUpdate(_id, userObj);
 };
 export const updateByEmail = (email, userObj) => {
-  console.log(email, userObj);
   return UserSchema.findOneAndUpdate(email, userObj);
 };
 
