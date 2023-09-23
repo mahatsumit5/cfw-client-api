@@ -8,7 +8,7 @@ export const stripePayment = async (req, res, next) => {
 
       mode: "payment", // 'payment', 'setup' or 'subscription'
       success_url:
-        process.env.NODE.ENV === "development"
+        process.env.NODE_ENV === "development"
           ? `${process.env.WEB_DOMAIN}/cart`
           : "/cart",
       cancel_url:
