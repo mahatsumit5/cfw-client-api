@@ -28,7 +28,6 @@ import productRouter from "./src/router/productRouter.js";
 import catagoryRouter from "./src/router/catagoryRouter.js";
 import paymentRouter from "./src/router/paymentRouter.js";
 import orderRouter from "./src/router/orderRouter.js";
-import mongoose from "mongoose";
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);

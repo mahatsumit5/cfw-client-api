@@ -28,18 +28,6 @@ export const stripePayment = async (req, res, next) => {
           quantity: `${item.orderQty}`,
         };
       }),
-      // line_items: [
-      //   {
-      //     price_data: {
-      //       currency: "aud",
-      //       product_data: {
-      //         name: "shoe",
-      //       },
-      //       unit_amount: 2599 * 100,
-      //     },
-      //     quantity: 2,
-      //   },
-      // ],
     });
     if (session.id) {
       res.json({ url: session.url, session });
