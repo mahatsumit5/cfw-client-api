@@ -1,18 +1,23 @@
 import mongoose from "mongoose";
-
+import product from "./productSchema.js";
 // const schema = new mongoose.Schema({ any: {} });
-const prouduct = mongoose.model("products", {});
+// const product = mongoose.model("products", {});
 
 export const getProducts = (filter) => {
-  return prouduct.find(filter);
+  return product.find(filter);
 };
 export const getOneProduct = (_id) => {
-  return prouduct.findById(_id);
+  return product.findById(_id);
 };
+
 export const getProductsByCatagory = (filter) => {
   const _id = new mongoose.Types.ObjectId(filter);
-  return prouduct.find({ parentCat: _id, status: "active" });
+  return product.find({ parentCat: _id, status: "active" });
 };
 export const getSingleProduct = (filter) => {
-  return prouduct.findOne(filter);
+  return product.findOne(filter);
+};
+export const postReviews = (filter, obj) => {
+  console.log(filter, obj);
+  return product.findOneAndUpdate(filter, { reviews: obj });
 };

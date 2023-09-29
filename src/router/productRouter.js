@@ -4,6 +4,7 @@ import {
   getProducts,
   getProductsByCatagory,
   getSingleProduct,
+  postReviews,
 } from "../model/products/productModel.js";
 
 const router = express.Router();
@@ -42,6 +43,28 @@ router.get("/catagories/:_id", async (req, res) => {
         });
   } catch (error) {
     res.json({ error });
+  }
+});
+
+router.put("/:slug/post-review", async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const product = await getSingleProduct(req.params);
+    if (product.reviews.length) {
+      req.body = [...product.reviews, req.body];
+    }
+    const result = await postReviews(req.params, req.body);
+    result?._id
+      ? res.json({
+          status: "success",
+          message: "Your review has been posted",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to post your review",
+        });
+  } catch (error) {
+    next(error);
   }
 });
 export default router;
