@@ -28,11 +28,15 @@ import productRouter from "./src/router/productRouter.js";
 import catagoryRouter from "./src/router/catagoryRouter.js";
 import paymentRouter from "./src/router/paymentRouter.js";
 import orderRouter from "./src/router/orderRouter.js";
+import reviewRouter from "./src/router/reviewRouter.js";
+import stripeRouter from "./src/router/stripePaymentIntent.js";
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/review", reviewRouter);
+app.use("/api/v1/stripe", stripeRouter);
 
 app.use("/", (req, res) => {
   res.sendFile(__dirname + "/build/index.html");

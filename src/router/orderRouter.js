@@ -1,7 +1,6 @@
 import express from "express";
 import { getOrderById, insertOrder } from "../model/order/orderModel.js";
 import { orderConfirmationEmail } from "../utils/nodeMailer.js";
-import { stripePayment } from "../middleware/stripeMiddleware.js";
 const router = express();
 router.post("/", async (req, res, next) => {
   try {
@@ -24,8 +23,6 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-
-router.post("/checkout-with-stripe", stripePayment);
 
 router.get("/:_id", async (req, res, next) => {
   try {
