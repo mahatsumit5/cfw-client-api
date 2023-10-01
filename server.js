@@ -38,8 +38,11 @@ app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/review", reviewRouter);
 app.use("/api/v1/stripe", stripeRouter);
 
-app.use("/", (req, res) => {
-  res.sendFile(__dirname + "/build/index.html");
+app.get("/", (req, res) => {
+  res.json({
+    status: "sucess",
+    message: "Server is up and running",
+  });
 });
 app.use((error, req, res, next) => {
   const code = error.statusCode || 500;
