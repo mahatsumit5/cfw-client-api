@@ -46,7 +46,7 @@ router.post("/", newUserValidation, async (req, res, next) => {
     const user = await insertUser(req.body);
     const uuid = v4();
     if (user?._id) {
-      const link = `${process.env.WEB_DOMAIN}/user-verification?c=${uuid}&&e=${user.email}`;
+      const link = `${process.env.WEB_DOMAIN}user-verification?c=${uuid}&&e=${user.email}`;
       const status = await accountVerificationEmail(user, link);
       res.json({
         status: "success",
@@ -116,7 +116,7 @@ router.post("/get-reset-pass-link", async (req, res, next) => {
       });
       console.log(result);
       if (result?._id) {
-        const link = `${process.env.WEB_DOMAIN}/reset-password?c=${token}&&e=${email}`;
+        const link = `${process.env.WEB_DOMAIN}reset-password?c=${token}&&e=${email}`;
         // send password reset link to the user to their email
         const isEmailSent = sendPasswordResetLink(user, link);
         console.log(isEmailSent, "email sent-------------------");
@@ -143,8 +143,6 @@ router.post("/get-reset-pass-link", async (req, res, next) => {
 });
 router.put("/reset-password/:email/:token", async (req, res, next) => {
   try {
-    console.log(req.body);
-    console.log(req.params, "comig from params------------");
     const { password } = req.body;
     const { email, token } = req.params;
     const result = await findOneAndDelete({
@@ -225,7 +223,6 @@ router.post("/addFav", auth, async (req, res, next) => {
       const newArrayOfFavItem = user.favouriteItem.filter(
         (item) => item._id.toString() !== fav._id
       );
-      console.log(newArrayOfFavItem, "new arrayyyyyyyyyyyyyyyyyyy");
       const result = await updateById(
         { _id },
         { favouriteItem: newArrayOfFavItem }
