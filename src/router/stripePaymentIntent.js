@@ -7,11 +7,10 @@ router.post("/payment-intent", async (req, res, next) => {
   try {
     const stripe = Stripe(process.env.STRIPE_API);
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.totalAmount * 1000,
+      amount: req.body.totalAmount * 100,
       currency: "aud",
       payment_method_types: [req.body.payment],
     });
-    console.log(req.body);
     res.json({
       status: "success",
       clientSecret: paymentIntent.client_secret,

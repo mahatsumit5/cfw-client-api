@@ -1,6 +1,7 @@
 // const schema = new mongoose.Schema({ any: {} });
+import product from "./productSchema.js";
 import mongoose from "mongoose";
-const product = mongoose.model("products", {});
+// const product = mongoose.model("products", {});
 
 export const getProducts = (filter) => {
   return product.find(filter);
@@ -15,4 +16,8 @@ export const getProductsByCatagory = (filter) => {
 };
 export const getSingleProduct = (filter) => {
   return product.findOne(filter);
+};
+export const postReviews = (filter, obj) => {
+  console.log(filter, obj);
+  return product.findOneAndUpdate(filter, { reviews: obj });
 };
