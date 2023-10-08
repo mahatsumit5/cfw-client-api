@@ -213,9 +213,15 @@ router.post("/logout", async (req, res, next) => {
   }
 });
 
-router.post("/addFav", auth, async (req, res, next) => {
+router.post("/addFav", async (req, res, next) => {
   try {
     const { _id, fav } = req.body;
+    if (!_id) {
+      return res.json({
+        status: "error",
+        message: "Please login first.",
+      });
+    }
     const user = await getUserById({ _id });
 
     if (user?.favouriteItem.some((item) => item.sku === fav.sku)) {
