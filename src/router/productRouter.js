@@ -5,6 +5,7 @@ import {
   getSingleProduct,
   postReviews,
 } from "../model/products/productModel.js";
+import { getCatagoryByFilter } from "../model/catalogue/catalogue.js";
 
 const router = express.Router();
 router.get("/:slug?/", async (req, res) => {
@@ -27,9 +28,10 @@ router.get("/:slug?/", async (req, res) => {
     res.json({ status: "error", error: error.message });
   }
 });
-router.get("/catagories/:_id", async (req, res) => {
+router.get("/catagories/:slug", async (req, res) => {
   try {
-    const { _id } = req.params;
+    const { slug } = req.params;
+    const { _id } = await getCatagoryByFilter({ slug });
     const result = await getProductsByCatagory(_id);
     result.length
       ? res.json({
