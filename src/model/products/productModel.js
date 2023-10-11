@@ -15,6 +15,8 @@ export const getSingleProduct = (filter) => {
   return product.findOne(filter);
 };
 export const postReviews = (filter, obj) => {
-  console.log(filter, obj);
   return product.findOneAndUpdate(filter, { reviews: obj });
+};
+export const updateReviews = (filter, obj) => {
+  return product.findOneAndUpdate(filter, { reviews: obj }, { new: true });
 };

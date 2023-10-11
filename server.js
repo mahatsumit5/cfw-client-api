@@ -29,12 +29,14 @@ import catagoryRouter from "./src/router/catagoryRouter.js";
 import paymentRouter from "./src/router/paymentRouter.js";
 import orderRouter from "./src/router/orderRouter.js";
 import stripeRouter from "./src/router/stripePaymentIntent.js";
+import subscribeRouter from "./src/router/subscribeRouter.js";
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/catagory", catagoryRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/stripe", stripeRouter);
+app.use("/api/v1/subscribe", subscribeRouter);
 
 app.get("/", (req, res) => {
   res.json({

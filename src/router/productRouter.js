@@ -4,8 +4,10 @@ import {
   getProductsByCatagory,
   getSingleProduct,
   postReviews,
+  updateReviews,
 } from "../model/products/productModel.js";
 import { getCatagoryByFilter } from "../model/catalogue/catalogue.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 router.get("/:slug?/", async (req, res) => {
@@ -56,11 +58,33 @@ router.put("/post-review", async (req, res, next) => {
       req.body = [...product.reviews, rest];
     }
     const result = await postReviews({ slug: slug }, req.body);
-    console.log(result);
     result?._id
       ? res.json({
           status: "success",
           message: "Your review has been posted",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to post your review",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/delete-review", async (req, res, next) => {
+  try {
+    const { _id, productSlug } = req.body;
+    const product = await getSingleProduct({ slug: productSlug });
+    const updatedReviews = product.reviews.filter(
+      (r) => r._id.toString() !== _id
+    );
+    const result = await updateReviews({ slug: productSlug }, updatedReviews);
+
+    result?._id
+      ? res.json({
+          status: "success",
+          message: "Review has been deleted",
         })
       : res.json({
           status: "error",
