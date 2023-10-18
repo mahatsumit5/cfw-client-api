@@ -1,6 +1,11 @@
 import express from "express";
-import { getOrderById, insertOrder } from "../model/order/orderModel.js";
+import {
+  getOrderById,
+  getOrderByUser,
+  insertOrder,
+} from "../model/order/orderModel.js";
 import { orderConfirmationEmail } from "../utils/nodeMailer.js";
+import mongoose from "mongoose";
 const router = express();
 router.post("/", async (req, res, next) => {
   try {
@@ -41,4 +46,35 @@ router.get("/:_id", async (req, res, next) => {
     next(error);
   }
 });
+
+router.get(
+  "/order/:userId/:fName/:lName/:phone/:email/:address",
+  async (req, res, next) => {
+    try {
+      const { userId, fName, lName, phone, email, address } = req.params;
+
+      const obj = {
+        _id: new mongoose.Types.ObjectId(userId),
+        fName: fName,
+        lName: lName,
+        phone: phone,
+        email: email,
+        address: address,
+      };
+      const result = await getOrderByUser(obj);
+      result.length
+        ? res.json({
+            status: "success",
+            message: "Here are the history of your orders",
+            result,
+          })
+        : res.json({
+            status: "error",
+            message: "No orders found",
+          });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 export default router;

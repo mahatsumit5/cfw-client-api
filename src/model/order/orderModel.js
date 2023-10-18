@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import orderSchema from "./orderSchema.js";
 
 export const insertOrder = (obj) => {
@@ -6,4 +7,7 @@ export const insertOrder = (obj) => {
 
 export const getOrderById = (_id) => {
   return orderSchema.findById(_id);
+};
+export const getOrderByUser = (filter) => {
+  return orderSchema.find({ user: filter });
 };
