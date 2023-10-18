@@ -262,5 +262,20 @@ router.post("/addFav", async (req, res, next) => {
     next(error);
   }
 });
+router.put("/", async (req, res, next) => {
+  try {
+    const { _id, ...rest } = req.body;
+    const result = await updateById(_id, rest);
+    result?._id
+      ? res.json({
+          status: "success",
+          message: "Update sucessfull",
+        })
+      : res.json({
+          status: "error",
+          message: "Error",
+        });
+  } catch (error) {}
+});
 
 export default router;
