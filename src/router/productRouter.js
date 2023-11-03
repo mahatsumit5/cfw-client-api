@@ -75,6 +75,7 @@ router.put("/post-review", async (req, res, next) => {
 router.put("/delete-review", async (req, res, next) => {
   try {
     const { _id, productSlug } = req.body;
+
     const product = await getSingleProduct({ slug: productSlug });
     const updatedReviews = product.reviews.filter(
       (r) => r._id.toString() !== _id
